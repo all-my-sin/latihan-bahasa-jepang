@@ -27,6 +27,7 @@ daftarkanBahasa({
       nama: "Kanji",
       jenis: "kanji", // jenis soal: kanji (punya kolom kanji, onyomi, kunyomi, contoh)
       data: [...KANJI_N5],
+      mirip: KANJI_MIRIP, // kelompok kanji yang bentuknya mirip (untuk pilihan jawaban)
     },
   ],
 });

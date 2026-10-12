@@ -10,6 +10,7 @@ const Penyimpanan = (() => {
   function dataAwal() {
     return {
       pengaturan: {}, // pilihan terakhir di halaman Latihan
+      pengaturanKanji: {}, // pilihan terakhir di halaman Latihan pilihan ganda kanji
       tema: null, // "terang", "gelap", atau null (ikut HP/laptop)
       tampilan: { furigana: true, romaji: true, tips: true }, // tombol あ di atas
       riwayat: [], // ringkasan setiap sesi latihan
@@ -65,6 +66,11 @@ const Penyimpanan = (() => {
 
     simpanPengaturan(pengaturan) {
       data.pengaturan = pengaturan;
+      simpan();
+    },
+
+    simpanPengaturanKanji(pengaturan) {
+      data.pengaturanKanji = pengaturan;
       simpan();
     },
 

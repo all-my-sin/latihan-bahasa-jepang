@@ -124,6 +124,9 @@
         <button type="button" id="tombol-berhenti" class="tombol">Berhenti</button>
         <button type="button" id="tombol-lanjut" class="tombol tombol-utama" hidden>Lanjut →</button>
       </div>
+
+      <!-- Kartu kanji lengkap muncul di sini setelah menjawab soal kanji -->
+      <div id="umpan-kartu" class="umpan-kartu" hidden></div>
     </section>
 
     <!-- ========== HALAMAN HASIL ========== -->
@@ -139,7 +142,7 @@
       <div class="baris-tombol tumpuk">
         <button type="button" id="ulangi-salah" class="tombol tombol-utama">Ulangi soal yang salah</button>
         <button type="button" id="latihan-lagi" class="tombol">Latihan lagi (pengaturan sama)</button>
-        <a href="#latihan" class="tombol">Ubah pengaturan</a>
+        <a href="#latihan" class="tombol" id="ubah-pengaturan">Ubah pengaturan</a>
       </div>
     </section>
 
@@ -156,15 +159,43 @@
           <span class="menu-pilihan-ikon" aria-hidden="true">🔁</span>
           <span><b>Ulangi hari ini</b><small>Segera hadir</small></span>
         </button>
-        <button type="button" class="menu-pilihan" disabled>
+        <a href="#kanji/latihan" class="menu-pilihan">
           <span class="menu-pilihan-ikon" aria-hidden="true">✅</span>
-          <span><b>Latihan pilihan ganda</b><small>Segera hadir</small></span>
-        </button>
+          <span><b>Latihan pilihan ganda</b><small>Arti, cara baca, dan kata contoh</small></span>
+        </a>
         <a href="#kanji/daftar" class="menu-pilihan">
           <span class="menu-pilihan-ikon" aria-hidden="true">🗂️</span>
           <span><b>Daftar kanji</b><small>Lihat semua kanji dan kartunya</small></span>
         </a>
       </div>
+    </section>
+
+    <!-- ========== HALAMAN PENGATURAN LATIHAN KANJI ========== -->
+    <section id="hal-kanji-latihan" class="halaman" hidden>
+      <p><a href="#kanji" class="kembali">← Menu kanji</a></p>
+      <h1>Latihan pilihan ganda kanji</h1>
+      <form id="form-kanji">
+        <fieldset>
+          <legend>Level</legend>
+          <div class="pilihan-chip" id="kanji-latihan-level"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            Jenis soal <small class="redup">(boleh lebih dari satu)</small>
+            <button type="button" id="kanji-jenis-semua" class="tombol-kecil">Campur semua</button>
+          </legend>
+          <div class="pilihan-jenis" id="kanji-latihan-jenis"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Jumlah soal</legend>
+          <div class="pilihan-chip" id="kanji-latihan-jumlah"></div>
+        </fieldset>
+
+        <p id="kanji-latihan-info" class="redup"></p>
+        <button type="submit" class="tombol tombol-utama tombol-lebar">Mulai</button>
+      </form>
     </section>
 
     <!-- ========== HALAMAN DAFTAR KANJI ========== -->
@@ -200,11 +231,13 @@
   <!-- Bahasa Jepang -->
   <script src="data/jepang/kosakata-n5.js"></script>
   <script src="data/jepang/kanji-n5.js"></script>
+  <script src="data/jepang/kanji-mirip.js"></script>
   <script src="data/jepang/materi.js"></script>
 
   <script src="js/teks-jepang.js"></script>
   <script src="js/penyimpanan.js"></script>
   <script src="js/soal.js"></script>
+  <script src="js/soal-kanji.js"></script>
   <script src="js/kanji.js"></script>
   <script src="js/app.js"></script>
 </body>

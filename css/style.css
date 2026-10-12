@@ -673,3 +673,47 @@ legend {
   .kk-baris { flex-direction: column; gap: 6px; }
   .kk-baris > .label { margin-top: 0; }
 }
+
+/* ---------- Latihan pilihan ganda kanji ---------- */
+.pilihan-jenis { display: grid; gap: 8px; }
+@media (min-width: 560px) {
+  .pilihan-jenis { grid-template-columns: 1fr 1fr; }
+}
+.jenis-soal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: 1px solid var(--garis);
+  border-radius: 12px;
+  background: var(--kartu);
+  cursor: pointer;
+}
+.jenis-soal input { width: 22px; height: 22px; accent-color: var(--utama); flex-shrink: 0; }
+.jenis-soal b { display: block; font-weight: 500; }
+.jenis-soal small { color: var(--redup); }
+.jenis-soal:has(input:checked) { border-color: var(--utama); background: var(--utama-lembut); }
+
+.teks-soal.kanji { font-size: 4.5rem; line-height: 1.2; }
+.arti-soal {
+  display: block;
+  margin-top: 6px;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--redup);
+}
+.tanda-khusus { margin-left: 8px; vertical-align: middle; font-size: 0.75rem; }
+
+.daftar-pilihan.dua-kolom { grid-template-columns: 1fr 1fr; }
+.opsi-kanji { font-size: 2.4rem; line-height: 1.2; }
+.pilihan-kanji { justify-content: flex-start; }
+.opsi-baca { display: flex; flex-direction: column; }
+.opsi-baca [lang="ja"] { font-size: 1.35rem; line-height: 1.4; }
+.opsi-baca .romaji { font-size: 0.8rem; color: var(--redup); }
+
+.umpan-balik .kk-tips { margin-top: 10px; }
+.umpan-balik .kk-kata { font-size: 1.2rem; }
+.kk-catatan.blok { display: block; }
+.umpan-kartu { margin-top: 12px; }
+.soal-salah .arti-soal { display: inline; margin-left: 8px; font-size: 0.9rem; }

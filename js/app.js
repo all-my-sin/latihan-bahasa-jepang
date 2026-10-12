@@ -37,6 +37,9 @@ function bukaDariAlamat() {
     tampilkanHalaman("latihan");
   } else if (nama === "kanji") {
     tampilkanHalaman("kanji");
+  } else if (nama === "kanji/latihan") {
+    Kanji.tampilkanFormLatihan();
+    tampilkanHalaman("kanji-latihan");
   } else if (nama === "kanji/daftar") {
     Kanji.tampilkanDaftar();
     tampilkanHalaman("kanji-daftar");
@@ -116,8 +119,14 @@ function tampilkanBeranda() {
     <div class="angka"><b>${totalSoal}</b><span>soal dijawab</span></div>
     <div class="angka"><b>${persen(totalBenar, totalSoal)}%</b><span>jawaban benar</span></div>`;
 
+  // kunci = "bahasa/materi/kategori" → tampil sebagai "Kanji · Angka"
+  const namaKategori = (kunci) => {
+    const [kodeBahasa, kodeMateri, ...kategori] = kunci.split("/");
+    const materi = cariBahasa(kodeBahasa).materi.find((m) => m.kode === kodeMateri);
+    return `${materi ? materi.nama : kodeMateri} · ${kategori.join("/")}`;
+  };
   const baris = Object.entries(data.kategori)
-    .map(([kunci, c]) => ({ nama: kunci.split("/").slice(2).join("/"), ...c, total: c.benar + c.salah }))
+    .map(([kunci, c]) => ({ nama: namaKategori(kunci), ...c, total: c.benar + c.salah }))
     .sort((a, b) => b.total - a.total);
 
   $("ringkasan-kategori").innerHTML = baris.length
@@ -318,8 +327,31 @@ $("form-latihan").addEventListener("submit", (e) => {
 // ------------------------------------------------------------
 let sesi = null;
 
-function mulaiSesi(bahasa, materi, arah, daftarSoal) {
-  sesi = { bahasa, materi, arah, soal: daftarSoal, nomor: 0, benar: 0, jawaban: [], sudahDijawab: false };
+// opsi (dipakai latihan kanji):
+//   buatLagi()             → daftar soal baru dengan pengaturan yang sama
+//   buatDariSalah(soal)    → daftar soal baru dari soal yang salah
+//   alamatPengaturan       → halaman pengaturan untuk tombol "Ubah pengaturan"
+function mulaiSesi(bahasa, materi, arah, daftarSoal, opsi = {}) {
+  sesi = {
+    bahasa,
+    materi,
+    arah,
+    soal: daftarSoal,
+    nomor: 0,
+    benar: 0,
+    jawaban: [],
+    sudahDijawab: false,
+    opsi: {
+      buatLagi: () => {
+        const { pilihan } = pengaturanLengkap();
+        return Soal.buatSesi(materi, pilihan);
+      },
+      buatDariSalah: (soalSalah) => Soal.buatSesiDariKata(materi, soalSalah.map((s) => s.item), arah),
+      alamatPengaturan: "#latihan",
+      ...opsi,
+    },
+  };
+  $("ubah-pengaturan").href = sesi.opsi.alamatPengaturan;
   // Ganti alamat ke #soal supaya menu "Latihan" tetap bisa diklik.
   history.replaceState(null, "", "#soal");
   tampilkanHalaman("soal");
@@ -354,24 +386,40 @@ function tampilkanSoal() {
   $("skor-sementara").textContent = `Benar: ${sesi.benar}`;
   $("bilah-isi").style.width = `${(sesi.nomor / sesi.soal.length) * 100}%`;
 
-  $("perintah").textContent = s.perintah;
   const teksSoal = $("teks-soal");
-  // Furigana hanya di soal "Kata → Arti". Di soal "Cara baca", furigana = jawabannya.
-  if (sesi.arah === "arti") teksSoal.innerHTML = kataFurigana(s.item);
-  else teksSoal.innerHTML = s.soalJepang ? teksJepang(s.teksSoal) : aman(s.teksSoal);
-  teksSoal.classList.toggle("jepang", s.soalJepang);
-  teksSoal.classList.toggle("panjang", s.teksSoal.length > 8);
+  let kelasPilihan = "";
 
+  if (s.kanji) {
+    // Soal kanji: tampilannya sudah disiapkan oleh soal-kanji.js
+    $("perintah").innerHTML = s.perintahHtml;
+    teksSoal.innerHTML = s.soalHtml;
+    teksSoal.className = `teks-soal ${s.kelasSoal}`;
+    kelasPilihan = s.kelasPilihan || "";
+  } else {
+    $("perintah").textContent = s.perintah;
+    // Furigana hanya di soal "Kata → Arti". Di soal "Cara baca", furigana = jawabannya.
+    if (sesi.arah === "arti") teksSoal.innerHTML = kataFurigana(s.item);
+    else teksSoal.innerHTML = s.soalJepang ? teksJepang(s.teksSoal) : aman(s.teksSoal);
+    teksSoal.className = "teks-soal";
+    teksSoal.classList.toggle("jepang", s.soalJepang);
+    teksSoal.classList.toggle("panjang", s.teksSoal.length > 8);
+    if (!s.soalJepang) kelasPilihan = "jepang";
+  }
+
+  const isiPilihan = (p) => (s.kanji ? p.html : s.soalJepang ? aman(p.teks) : kataFurigana(p.item));
+  // Pilihan berupa satu kanji cukup kecil, jadi selalu 2 kolom (juga di HP)
+  $("daftar-pilihan").className = `daftar-pilihan${s.jenisSoal === "kanji" ? " dua-kolom" : ""}`;
   $("daftar-pilihan").innerHTML = s.pilihan
     .map(
-      (p, i) => `<button type="button" class="pilihan${s.soalJepang ? "" : " jepang"}" data-i="${i}">
+      (p, i) => `<button type="button" class="pilihan ${kelasPilihan}" data-i="${i}">
         <span class="nomor">${i + 1}</span>
-        <span class="teks">${s.soalJepang ? aman(p.teks) : kataFurigana(p.item)}</span>
+        <span class="teks">${isiPilihan(p)}</span>
       </button>`
     )
     .join("");
 
   $("umpan-balik").hidden = true;
+  $("umpan-kartu").hidden = true;
   $("tombol-lanjut").hidden = true;
 }
 
@@ -384,7 +432,8 @@ function jawab(indeks) {
   if (benar) sesi.benar++;
   sesi.jawaban.push({ soal: s, dipilih: indeks, benar });
 
-  Penyimpanan.catatJawaban(sesi.bahasa.kode, sesi.materi.kode, s.item.kategori, Soal.kunciKata(s.item), benar);
+  if (s.kanji) Penyimpanan.catatJawaban(sesi.bahasa.kode, sesi.materi.kode, s.kategori, s.kunci, benar);
+  else Penyimpanan.catatJawaban(sesi.bahasa.kode, sesi.materi.kode, s.item.kategori, Soal.kunciKata(s.item), benar);
 
   // Warnai tombol: hijau = jawaban benar, merah = pilihanmu yang salah
   document.querySelectorAll("#daftar-pilihan .pilihan").forEach((btn, i) => {
@@ -393,12 +442,20 @@ function jawab(indeks) {
     else if (i === indeks) btn.classList.add("salah");
   });
 
-  const dipilih = s.pilihan[indeks].item;
-  let isi = benar ? `<p class="judul-umpan">✓ Benar!</p>` : `<p class="judul-umpan">✗ Belum tepat</p>`;
-  isi += `<p>${penjelasanKata(s.item)}</p>`;
-  if (!benar) isi += `<p class="redup">Pilihanmu: ${penjelasanKata(dipilih)}</p>`;
-  isi += `<p class="redup kecil">Kategori: ${aman(s.item.kategori)}</p>`;
-  if (s.item.catatan) isi += `<p class="redup kecil">Catatan: ${aman(s.item.catatan)}</p>`;
+  let isi;
+  if (s.kanji) {
+    isi = Kanji.umpanBalik(s, indeks, benar);
+    // Kartu kanji lengkap, supaya sekalian belajar
+    $("umpan-kartu").innerHTML = Kanji.kartuSetelahJawab(s, benar);
+    $("umpan-kartu").hidden = false;
+  } else {
+    const dipilih = s.pilihan[indeks].item;
+    isi = benar ? `<p class="judul-umpan">✓ Benar!</p>` : `<p class="judul-umpan">✗ Belum tepat</p>`;
+    isi += `<p>${penjelasanKata(s.item)}</p>`;
+    if (!benar) isi += `<p class="redup">Pilihanmu: ${penjelasanKata(dipilih)}</p>`;
+    isi += `<p class="redup kecil">Kategori: ${aman(s.item.kategori)}</p>`;
+    if (s.item.catatan) isi += `<p class="redup kecil">Catatan: ${aman(s.item.catatan)}</p>`;
+  }
 
   const umpan = $("umpan-balik");
   umpan.innerHTML = isi;
@@ -428,7 +485,7 @@ $("tombol-lanjut").addEventListener("click", lanjut);
 
 $("tombol-berhenti").addEventListener("click", () => {
   if (sesi && sesi.jawaban.length) selesai();
-  else location.hash = "#latihan";
+  else location.hash = sesi ? sesi.opsi.alamatPengaturan : "#latihan";
 });
 
 // Di laptop: tekan 1-4 untuk memilih, Enter untuk lanjut.
@@ -464,8 +521,15 @@ function selesai() {
   $("daftar-salah").innerHTML = salah.length
     ? `<h2>Soal yang salah (${salah.length})</h2>` +
       salah
-        .map(
-          (j) => `<div class="kartu-salah">
+        .map((j) =>
+          j.soal.kanji
+            ? `<div class="kartu-salah">
+            <p class="kecil redup">${j.soal.perintahHtml}</p>
+            <p class="soal-salah">${j.soal.soalHtml}</p>
+            <p>✗ Jawabanmu: ${j.soal.pilihan[j.dipilih].html}</p>
+            <p>✓ Jawaban benar: ${j.soal.teksBenar}</p>
+          </div>`
+            : `<div class="kartu-salah">
             <p class="kecil redup">${aman(j.soal.perintah)}</p>
             <p class="soal-salah">${j.soal.soalJepang ? teksJepang(j.soal.teksSoal) : aman(j.soal.teksSoal)}</p>
             <p>✗ Jawabanmu: ${j.soal.soalJepang ? aman(j.soal.pilihan[j.dipilih].teks) : teksJepang(j.soal.pilihan[j.dipilih].teks)}</p>
@@ -480,13 +544,14 @@ function selesai() {
 }
 
 $("ulangi-salah").addEventListener("click", () => {
-  const kata = sesi.jawaban.filter((j) => !j.benar).map((j) => j.soal.item);
-  mulaiSesi(sesi.bahasa, sesi.materi, sesi.arah, Soal.buatSesiDariKata(sesi.materi, kata, sesi.arah));
+  const soalSalah = sesi.jawaban.filter((j) => !j.benar).map((j) => j.soal);
+  const { bahasa, materi, arah, opsi } = sesi;
+  mulaiSesi(bahasa, materi, arah, opsi.buatDariSalah(soalSalah), opsi);
 });
 
 $("latihan-lagi").addEventListener("click", () => {
-  const { bahasa, materi, pilihan } = pengaturanLengkap();
-  mulaiSesi(bahasa, materi, pilihan.arah, Soal.buatSesi(materi, pilihan));
+  const { bahasa, materi, arah, opsi } = sesi;
+  mulaiSesi(bahasa, materi, arah, opsi.buatLagi(), opsi);
 });
 
 // ------------------------------------------------------------

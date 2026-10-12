@@ -56,7 +56,8 @@ const Kanji = (() => {
     </div>`;
   }
 
-  function kartu(k) {
+  // opsi.tanpaTips: true kalau tips sudah ditampilkan di tempat lain
+  function kartu(k, opsi = {}) {
     return `<article class="kartu-kanji">
       <div class="kk-kepala">
         <div class="kk-huruf" lang="ja">${aman(k.kanji)}</div>
@@ -82,7 +83,7 @@ const Kanji = (() => {
       <h3 class="kk-judul">Contoh kata</h3>
       <ul class="kk-contoh">${k.contoh.map(contohKata).join("")}</ul>
 
-      ${kotakTips(k)}
+      ${opsi.tanpaTips ? "" : kotakTips(k)}
 
       <details class="kk-penjelasan">
         <summary>Apa itu kunyomi dan onyomi?</summary>
@@ -187,5 +188,127 @@ const Kanji = (() => {
     if (e.key === "ArrowRight") bukaKartu(posisiKartu + 1);
   });
 
-  return { semuaKanji, kartu, tampilkanDaftar };
+  // ------------------------------------------------------------
+  // HALAMAN PENGATURAN LATIHAN PILIHAN GANDA KANJI
+  // ------------------------------------------------------------
+  const PILIHAN_JUMLAH = [10, 20, 50];
+  let atur = {
+    level: "N5", // "N5", "N4", atau "semua"
+    jenis: Object.keys(SoalKanji.JENIS),
+    jumlah: 10,
+    ...Penyimpanan.data.pengaturanKanji,
+  };
+
+  function chip(nama, nilai, teks, terpilih, jenis = "radio", nonaktif = false) {
+    return `<label class="chip${nonaktif ? " nonaktif" : ""}">
+      <input type="${jenis}" name="${nama}" value="${aman(nilai)}" ${terpilih ? "checked" : ""} ${nonaktif ? "disabled" : ""}>
+      <span>${teks}</span>
+    </label>`;
+  }
+
+  function levelTerpilih(bahasa) {
+    return atur.level === "semua" ? bahasa.level : [atur.level];
+  }
+
+  function tampilkanFormLatihan() {
+    const { bahasa, data } = semuaKanji();
+    if (!bahasa) return;
+    const levelAda = bahasa.level.filter((lv) => data.some((k) => k.level === lv));
+    if (atur.level !== "semua" && !levelAda.includes(atur.level)) atur.level = levelAda[0];
+    if (atur.level === "semua" && levelAda.length < 2) atur.level = levelAda[0];
+
+    el("kanji-latihan-level").innerHTML =
+      bahasa.level
+        .map((lv) => {
+          const ada = levelAda.includes(lv);
+          return chip("level", lv, ada ? lv : `${lv} <small>(belum ada)</small>`, atur.level === lv, "radio", !ada);
+        })
+        .join("") + chip("level", "semua", "Keduanya", atur.level === "semua", "radio", levelAda.length < 2);
+
+    el("kanji-latihan-jenis").innerHTML = Object.entries(SoalKanji.JENIS)
+      .map(
+        ([kode, j]) => `<label class="jenis-soal">
+          <input type="checkbox" name="jenis" value="${kode}" ${atur.jenis.includes(kode) ? "checked" : ""}>
+          <span><b>${aman(j.label)}</b><small lang="ja">${aman(j.contoh)}</small></span>
+        </label>`
+      )
+      .join("");
+
+    el("kanji-latihan-jumlah").innerHTML = PILIHAN_JUMLAH.map((n) =>
+      chip("jumlah", n, `${n} soal`, atur.jumlah === n)
+    ).join("");
+
+    perbaruiInfoLatihan();
+  }
+
+  function bacaFormLatihan() {
+    const form = el("form-kanji");
+    atur = {
+      level: form.querySelector('input[name="level"]:checked')?.value || atur.level,
+      jenis: [...form.querySelectorAll('input[name="jenis"]:checked')].map((i) => i.value),
+      jumlah: Number(form.querySelector('input[name="jumlah"]:checked')?.value) || 10,
+    };
+  }
+
+  function perbaruiInfoLatihan() {
+    const { bahasa, materi } = semuaKanji();
+    const ada = SoalKanji.hitungTersedia(materi, levelTerpilih(bahasa));
+    const info = el("kanji-latihan-info");
+    if (!atur.jenis.length) info.textContent = "Pilih minimal satu jenis soal.";
+    else if (ada < atur.jumlah) info.textContent = `Hanya ada ${ada} kanji, jadi latihan berisi ${ada} soal.`;
+    else info.textContent = `${ada} kanji tersedia. Setiap soal memakai kanji yang berbeda.`;
+  }
+
+  el("form-kanji").addEventListener("change", () => {
+    bacaFormLatihan();
+    perbaruiInfoLatihan();
+  });
+
+  el("kanji-jenis-semua").addEventListener("click", () => {
+    document.querySelectorAll('#kanji-latihan-jenis input[name="jenis"]').forEach((i) => (i.checked = true));
+    bacaFormLatihan();
+    perbaruiInfoLatihan();
+  });
+
+  // Data kosakata dipakai untuk memastikan pilihan salah bukan cara baca yang benar
+  function dataKosakata(bahasa) {
+    return bahasa.materi.filter((m) => m.jenis === "kata").flatMap((m) => m.data);
+  }
+
+  el("form-kanji").addEventListener("submit", (e) => {
+    e.preventDefault();
+    bacaFormLatihan();
+    if (!atur.jenis.length) return perbaruiInfoLatihan();
+    Penyimpanan.simpanPengaturanKanji(atur);
+
+    const { bahasa, materi } = semuaKanji();
+    const kosakata = dataKosakata(bahasa);
+    const pengaturan = { level: levelTerpilih(bahasa), jenis: atur.jenis, jumlah: atur.jumlah };
+    const buat = () => SoalKanji.buatSesi(materi, pengaturan, kosakata);
+
+    mulaiSesi(bahasa, materi, atur.jenis.join("+"), buat(), {
+      buatLagi: buat,
+      buatDariSalah: (soalSalah) => SoalKanji.buatUlang(materi, soalSalah, kosakata),
+      alamatPengaturan: "#kanji/latihan",
+    });
+  });
+
+  // ------------------------------------------------------------
+  // PENJELASAN SETELAH MENJAWAB SOAL KANJI
+  // ------------------------------------------------------------
+  function umpanBalik(s, indeks, benar) {
+    let isi = benar ? `<p class="judul-umpan">✓ Benar!</p>` : `<p class="judul-umpan">✗ Belum tepat</p>`;
+    isi += `<p>Jawaban benar: ${s.teksBenar}</p>`;
+    if (!benar) {
+      isi += `<p class="redup">Pilihanmu: ${s.jelaskanPilihan(s.pilihan[indeks])}</p>`;
+      isi += kotakTips(s.kanji); // tips langsung terlihat kalau jawaban salah
+    }
+    return isi;
+  }
+
+  function kartuSetelahJawab(s, benar) {
+    return kartu(s.kanji, { tanpaTips: !benar });
+  }
+
+  return { semuaKanji, kartu, tampilkanDaftar, tampilkanFormLatihan, umpanBalik, kartuSetelahJawab };
 })();

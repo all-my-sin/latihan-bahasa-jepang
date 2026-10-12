@@ -13,6 +13,9 @@
 //   kunyomi        : cara baca asli Jepang (ditulis dengan hiragana)
 //                    Huruf di dalam kurung = okurigana, yaitu hiragana
 //                    yang ditulis setelah kanji. Contoh: た(べる) → 食べる
+//   bacaanJarang   : (tidak wajib) cara baca lain yang jarang dipakai.
+//                    Tidak ditampilkan di kartu, tapi tidak akan dipakai
+//                    sebagai pilihan jawaban yang salah.
 //   arti           : arti dalam bahasa Indonesia
 //   tips           : cerita singkat untuk membantu mengingat bentuknya
 //   contoh         : 2–3 kata contoh. Setiap contoh berisi:
@@ -21,6 +24,9 @@
 //                        "kunyomi", "onyomi", atau
 //                        "khusus" (bacaan khusus yang harus dihafal,
 //                                  diberi penjelasan di "catatan")
+//                    bacaLain (tidak wajib) = cara baca lain yang juga
+//                      benar, supaya tidak dipakai sebagai pilihan salah.
+//                      Contoh: 七時 → bacaLain: ["ななじ"]
 //
 // Catatan: daftar N5 resmi tidak diterbitkan lagi sejak 2010,
 // jadi daftar ini mengikuti daftar yang umum dipakai buku latihan.
@@ -51,6 +57,7 @@ const KANJI_N5 = [
   {
     id: 3, kanji: "三", kategori: "Angka", level: "N5", jumlahGoresan: 3,
     onyomi: ["サン"], kunyomi: ["み", "みっ(つ)"], arti: "tiga",
+    bacaanJarang: ["み(つ)"],
     tips: "Tiga garis mendatar = tiga. Garis paling bawah paling panjang.",
     contoh: [
       { kata: "三月", baca: "さんがつ", arti: "bulan Maret", jenisBaca: "onyomi" },
@@ -81,6 +88,7 @@ const KANJI_N5 = [
   {
     id: 6, kanji: "六", kategori: "Angka", level: "N5", jumlahGoresan: 4,
     onyomi: ["ロク"], kunyomi: ["む", "むっ(つ)"], arti: "enam",
+    bacaanJarang: ["むい"],
     tips: "Orang memakai topi (titik dan garis di atas) dengan dua kaki terbuka.",
     contoh: [
       { kata: "六月", baca: "ろくがつ", arti: "bulan Juni", jenisBaca: "onyomi" },
@@ -92,7 +100,7 @@ const KANJI_N5 = [
     onyomi: ["シチ"], kunyomi: ["なな", "なな(つ)", "なの"], arti: "tujuh",
     tips: "Mirip angka 7 yang terbalik dan dicoret di tengahnya.",
     contoh: [
-      { kata: "七時", baca: "しちじ", arti: "jam tujuh", jenisBaca: "onyomi" },
+      { kata: "七時", baca: "しちじ", arti: "jam tujuh", jenisBaca: "onyomi", bacaLain: ["ななじ"] },
       { kata: "七つ", baca: "ななつ", arti: "tujuh buah", jenisBaca: "kunyomi" },
       { kata: "七日", baca: "なのか", arti: "tanggal 7 / 7 hari", jenisBaca: "kunyomi" },
     ],
@@ -120,6 +128,7 @@ const KANJI_N5 = [
   {
     id: 10, kanji: "十", kategori: "Angka", level: "N5", jumlahGoresan: 2,
     onyomi: ["ジュウ"], kunyomi: ["とお", "と"], arti: "sepuluh",
+    bacaanJarang: ["ジッ"],
     tips: "Tanda tambah (+), seperti angka Romawi X yang diputar.",
     contoh: [
       { kata: "十日", baca: "とおか", arti: "tanggal sepuluh", jenisBaca: "kunyomi" },
@@ -179,6 +188,7 @@ const KANJI_N5 = [
   {
     id: 16, kanji: "月", kategori: "Hari & Waktu", level: "N5", jumlahGoresan: 4,
     onyomi: ["ゲツ", "ガツ"], kunyomi: ["つき"], arti: "bulan",
+    bacaanJarang: ["ガツ"],
     tips: "Bulan sabit yang berdiri, dengan dua garis di dalamnya.",
     contoh: [
       { kata: "月曜日", baca: "げつようび", arti: "hari Senin", jenisBaca: "onyomi" },
@@ -189,6 +199,7 @@ const KANJI_N5 = [
   {
     id: 17, kanji: "火", kategori: "Hari & Waktu", level: "N5", jumlahGoresan: 4,
     onyomi: ["カ"], kunyomi: ["ひ"], arti: "api",
+    bacaanJarang: ["ほ"],
     tips: "Api unggun: lidah api di tengah dan percikan api di kiri-kanan.",
     contoh: [
       { kata: "火曜日", baca: "かようび", arti: "hari Selasa", jenisBaca: "onyomi" },
@@ -208,6 +219,7 @@ const KANJI_N5 = [
   {
     id: 19, kanji: "木", kategori: "Hari & Waktu", level: "N5", jumlahGoresan: 4,
     onyomi: ["モク", "ボク"], kunyomi: ["き"], arti: "pohon; kayu",
+    bacaanJarang: ["こ"],
     tips: "Gambar pohon: batang tegak, dahan mendatar, dan akar di bawah.",
     contoh: [
       { kata: "木曜日", baca: "もくようび", arti: "hari Kamis", jenisBaca: "onyomi" },
@@ -217,6 +229,7 @@ const KANJI_N5 = [
   {
     id: 20, kanji: "金", kategori: "Hari & Waktu", level: "N5", jumlahGoresan: 8,
     onyomi: ["キン", "コン"], kunyomi: ["かね"], arti: "emas; uang",
+    bacaanJarang: ["かな"],
     tips: "Atap di atas tanah (土), dengan dua bongkah emas berkilau di dalamnya — tambang emas.",
     contoh: [
       { kata: "お金", baca: "おかね", arti: "uang", jenisBaca: "kunyomi" },
@@ -302,6 +315,7 @@ const KANJI_N5 = [
   {
     id: 29, kanji: "後", kategori: "Hari & Waktu", level: "N5", jumlahGoresan: 9,
     onyomi: ["ゴ", "コウ"], kunyomi: ["うし(ろ)", "あと", "のち"], arti: "belakang; setelah",
+    bacaanJarang: ["おく(れる)"],
     tips: "Langkah kaki (彳) + benang kecil + kaki diseret (夂): berjalan lambat sehingga tertinggal di belakang.",
     contoh: [
       { kata: "後ろ", baca: "うしろ", arti: "belakang", jenisBaca: "kunyomi" },
@@ -312,6 +326,7 @@ const KANJI_N5 = [
   {
     id: 30, kanji: "毎", kategori: "Hari & Waktu", level: "N5", jumlahGoresan: 6,
     onyomi: ["マイ"], kunyomi: [], arti: "setiap",
+    bacaanJarang: ["ごと"],
     tips: "Ibu (母) memakai topi di atasnya — setiap hari ibu memakai topinya.",
     contoh: [
       { kata: "毎日", baca: "まいにち", arti: "setiap hari", jenisBaca: "onyomi" },
@@ -354,6 +369,7 @@ const KANJI_N5 = [
   {
     id: 34, kanji: "上", kategori: "Arah & Posisi", level: "N5", jumlahGoresan: 3,
     onyomi: ["ジョウ"], kunyomi: ["うえ", "あ(がる)", "のぼ(る)"], arti: "atas",
+    bacaanJarang: ["ショウ", "うわ", "かみ"],
     tips: "Ada garis kecil di ATAS garis dasar → atas. Kebalikan dari 下.",
     contoh: [
       { kata: "上手", baca: "じょうず", arti: "pandai", jenisBaca: "khusus", catatan: "Bacaan khusus: 上手 dibaca じょうず sebagai satu kesatuan. Harus dihafal." },
@@ -364,6 +380,7 @@ const KANJI_N5 = [
   {
     id: 35, kanji: "下", kategori: "Arah & Posisi", level: "N5", jumlahGoresan: 3,
     onyomi: ["カ", "ゲ"], kunyomi: ["した", "さ(がる)", "くだ(さる)", "お(りる)"], arti: "bawah",
+    bacaanJarang: ["しも", "もと", "くだ(る)"],
     tips: "Ada garis kecil di BAWAH garis atas → bawah. Kebalikan dari 上.",
     contoh: [
       { kata: "下さい", baca: "ください", arti: "tolong berikan", jenisBaca: "kunyomi" },
@@ -374,6 +391,7 @@ const KANJI_N5 = [
   {
     id: 36, kanji: "中", kategori: "Arah & Posisi", level: "N5", jumlahGoresan: 4,
     onyomi: ["チュウ"], kunyomi: ["なか"], arti: "dalam; tengah",
+    bacaanJarang: ["ジュウ"],
     tips: "Kotak yang ditusuk garis tepat di TENGAH-nya.",
     contoh: [
       { kata: "中国", baca: "ちゅうごく", arti: "Tiongkok", jenisBaca: "onyomi" },
@@ -464,6 +482,7 @@ const KANJI_N5 = [
   {
     id: 45, kanji: "子", kategori: "Orang & Tubuh", level: "N5", jumlahGoresan: 3,
     onyomi: ["シ", "ス"], kunyomi: ["こ"], arti: "anak",
+    bacaanJarang: ["ね"],
     tips: "Bayi yang dibedong dengan kedua tangan terentang.",
     contoh: [
       { kata: "子ども", baca: "こども", arti: "anak-anak", jenisBaca: "kunyomi" },
@@ -474,6 +493,7 @@ const KANJI_N5 = [
   {
     id: 46, kanji: "女", kategori: "Orang & Tubuh", level: "N5", jumlahGoresan: 3,
     onyomi: ["ジョ", "ニョ"], kunyomi: ["おんな"], arti: "perempuan",
+    bacaanJarang: ["ニョウ", "め"],
     tips: "Perempuan yang duduk bersimpuh dengan anggun.",
     contoh: [
       { kata: "女の子", baca: "おんなのこ", arti: "anak perempuan", jenisBaca: "kunyomi" },
@@ -532,6 +552,7 @@ const KANJI_N5 = [
   {
     id: 52, kanji: "目", kategori: "Orang & Tubuh", level: "N5", jumlahGoresan: 5,
     onyomi: ["モク"], kunyomi: ["め"], arti: "mata",
+    bacaanJarang: ["ボク", "ま"],
     tips: "Gambar mata yang diputar berdiri: kotak dengan dua garis di dalamnya.",
     contoh: [
       { kata: "目", baca: "め", arti: "mata", jenisBaca: "kunyomi" },
@@ -561,6 +582,7 @@ const KANJI_N5 = [
   {
     id: 55, kanji: "手", kategori: "Orang & Tubuh", level: "N5", jumlahGoresan: 4,
     onyomi: ["シュ"], kunyomi: ["て"], arti: "tangan",
+    bacaanJarang: ["た"],
     tips: "Telapak tangan dengan jari-jari (garis mendatar) dan lengan (garis tegak yang melengkung).",
     contoh: [
       { kata: "手紙", baca: "てがみ", arti: "surat", jenisBaca: "kunyomi" },
@@ -672,6 +694,7 @@ const KANJI_N5 = [
   {
     id: 66, kanji: "生", kategori: "Sekolah & Buku", level: "N5", jumlahGoresan: 5,
     onyomi: ["セイ", "ショウ"], kunyomi: ["い(きる)", "う(まれる)", "なま"], arti: "hidup; lahir; mentah",
+    bacaanJarang: ["お(う)", "は(える)", "き"],
     tips: "Tunas yang tumbuh dari tanah (土) → hidup, lahir.",
     contoh: [
       { kata: "先生", baca: "せんせい", arti: "guru", jenisBaca: "onyomi" },
@@ -714,6 +737,7 @@ const KANJI_N5 = [
   {
     id: 70, kanji: "行", kategori: "Kata Kerja", level: "N5", jumlahGoresan: 6,
     onyomi: ["コウ", "ギョウ"], kunyomi: ["い(く)", "おこな(う)"], arti: "pergi",
+    bacaanJarang: ["アン", "ゆ(く)"],
     tips: "Gambar persimpangan jalan (彳 dan 亍): pergi melewati jalan.",
     contoh: [
       { kata: "行く", baca: "いく", arti: "pergi", jenisBaca: "kunyomi" },
@@ -724,6 +748,7 @@ const KANJI_N5 = [
   {
     id: 71, kanji: "来", kategori: "Kata Kerja", level: "N5", jumlahGoresan: 7,
     onyomi: ["ライ"], kunyomi: ["く(る)", "き(ます)"], arti: "datang",
+    bacaanJarang: ["きた(る)", "きた(す)"],
     tips: "Pohon (木) yang sedang berbuah dengan garis di atasnya — musim panen datang.",
     contoh: [
       { kata: "来年", baca: "らいねん", arti: "tahun depan", jenisBaca: "onyomi" },
@@ -734,6 +759,7 @@ const KANJI_N5 = [
   {
     id: 72, kanji: "出", kategori: "Kata Kerja", level: "N5", jumlahGoresan: 5,
     onyomi: ["シュツ"], kunyomi: ["で(る)", "だ(す)"], arti: "keluar",
+    bacaanJarang: ["スイ"],
     tips: "Dua gunung (山) yang bertumpuk — keluar dari lembah.",
     contoh: [
       { kata: "出口", baca: "でぐち", arti: "pintu keluar", jenisBaca: "kunyomi" },
@@ -754,6 +780,7 @@ const KANJI_N5 = [
   {
     id: 74, kanji: "食", kategori: "Kata Kerja", level: "N5", jumlahGoresan: 9,
     onyomi: ["ショク"], kunyomi: ["た(べる)"], arti: "makan",
+    bacaanJarang: ["ジキ", "く(う)"],
     tips: "Atap (人) di atas makanan yang baik (良) → makan.",
     contoh: [
       { kata: "食べる", baca: "たべる", arti: "makan", jenisBaca: "kunyomi" },
@@ -793,6 +820,7 @@ const KANJI_N5 = [
   {
     id: 78, kanji: "読", kategori: "Kata Kerja", level: "N5", jumlahGoresan: 14,
     onyomi: ["ドク"], kunyomi: ["よ(む)"], arti: "membaca",
+    bacaanJarang: ["トク", "トウ"],
     tips: "Berkata (言) + menjual (売): pedagang membacakan barang jualannya keras-keras.",
     contoh: [
       { kata: "読む", baca: "よむ", arti: "membaca", jenisBaca: "kunyomi" },
@@ -840,6 +868,7 @@ const KANJI_N5 = [
   {
     id: 83, kanji: "立", kategori: "Kata Kerja", level: "N5", jumlahGoresan: 5,
     onyomi: ["リツ"], kunyomi: ["た(つ)"], arti: "berdiri",
+    bacaanJarang: ["リュウ"],
     tips: "Orang berdiri tegak di atas tanah (garis bawah).",
     contoh: [
       { kata: "立つ", baca: "たつ", arti: "berdiri", jenisBaca: "kunyomi" },
@@ -908,6 +937,7 @@ const KANJI_N5 = [
   {
     id: 90, kanji: "新", kategori: "Kata Sifat", level: "N5", jumlahGoresan: 13,
     onyomi: ["シン"], kunyomi: ["あたら(しい)"], arti: "baru",
+    bacaanJarang: ["あら(た)", "にい"],
     tips: "Berdiri (立) + pohon (木) + kapak (斤): pohon yang baru saja ditebang → baru.",
     contoh: [
       { kata: "新しい", baca: "あたらしい", arti: "baru", jenisBaca: "kunyomi" },
@@ -926,6 +956,7 @@ const KANJI_N5 = [
   {
     id: 92, kanji: "白", kategori: "Kata Sifat", level: "N5", jumlahGoresan: 5,
     onyomi: ["ハク"], kunyomi: ["しろ", "しろ(い)"], arti: "putih",
+    bacaanJarang: ["ビャク", "しら"],
     tips: "Matahari (日) dengan seberkas sinar di atasnya → putih bersinar.",
     contoh: [
       { kata: "白い", baca: "しろい", arti: "putih", jenisBaca: "kunyomi" },
@@ -997,6 +1028,7 @@ const KANJI_N5 = [
   {
     id: 99, kanji: "道", kategori: "Tempat & Benda", level: "N5", jumlahGoresan: 12,
     onyomi: ["ドウ"], kunyomi: ["みち"], arti: "jalan",
+    bacaanJarang: ["トウ"],
     tips: "Kepala (首) + jalan (辶): kepala menunjukkan arah jalan.",
     contoh: [
       { kata: "道", baca: "みち", arti: "jalan", jenisBaca: "kunyomi" },
