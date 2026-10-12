@@ -12,12 +12,16 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Pasang mode gelap/terang secepatnya supaya layar tidak berkedip. -->
+  <!-- Pasang mode gelap/terang dan pengaturan tampilan secepatnya supaya layar tidak berkedip. -->
   <script>
     try {
       const simpanan = JSON.parse(localStorage.getItem("latihanBahasa.v1") || "{}");
       if (simpanan.tema === "gelap") document.documentElement.dataset.theme = "dark";
       if (simpanan.tema === "terang") document.documentElement.dataset.theme = "light";
+      const t = simpanan.tampilan || {};
+      document.documentElement.classList.toggle("sembunyi-furigana", t.furigana === false);
+      document.documentElement.classList.toggle("sembunyi-romaji", t.romaji === false);
+      document.documentElement.classList.toggle("sembunyi-tips", t.tips === false);
     } catch (e) {}
   </script>
 </head>
@@ -25,10 +29,21 @@
   <header class="kepala">
     <div class="kepala-isi">
       <a href="#beranda" class="logo"><span id="logo-bahasa" lang="ja">日本語</span> <span class="logo-teks">Latihan</span></a>
+      <!-- Di HP, menu ini pindah ke bagian bawah layar -->
       <nav class="menu">
-        <a href="#beranda" data-halaman="beranda">Beranda</a>
-        <a href="#latihan" data-halaman="latihan">Latihan</a>
+        <a href="#beranda" data-menu="beranda"><span class="menu-ikon" aria-hidden="true">🏠</span>Beranda</a>
+        <a href="#latihan" data-menu="latihan"><span class="menu-ikon" aria-hidden="true">✏️</span>Latihan</a>
+        <a href="#kanji" data-menu="kanji"><span class="menu-ikon" lang="ja" aria-hidden="true">漢</span>Kanji</a>
       </nav>
+      <!-- Tombol あ: pengaturan furigana, romaji, dan tips (berlaku di semua halaman) -->
+      <details class="tampilan" id="menu-tampilan">
+        <summary class="tombol-ikon" aria-label="Pengaturan tampilan" title="Furigana, romaji, tips"><span lang="ja">あ</span></summary>
+        <div class="panel-tampilan">
+          <label class="saklar"><input type="checkbox" id="atur-furigana"><span>Furigana <small>(cara baca di atas kanji)</small></span></label>
+          <label class="saklar"><input type="checkbox" id="atur-romaji"><span>Romaji <small>(huruf latin)</small></span></label>
+          <label class="saklar"><input type="checkbox" id="atur-tips"><span>Tips mengingat kanji</span></label>
+        </div>
+      </details>
       <button id="tombol-tema" class="tombol-ikon" type="button" aria-label="Ganti mode gelap / terang" title="Mode gelap / terang">🌙</button>
     </div>
   </header>
@@ -127,12 +142,56 @@
         <a href="#latihan" class="tombol">Ubah pengaturan</a>
       </div>
     </section>
+
+    <!-- ========== HALAMAN MENU KANJI ========== -->
+    <section id="hal-kanji" class="halaman" hidden>
+      <h1>Kanji <span lang="ja">漢字</span></h1>
+      <p class="redup">Pelajari kanji sedikit demi sedikit, lalu ulangi sesuai jadwal.</p>
+      <div class="menu-kartu">
+        <button type="button" class="menu-pilihan" disabled>
+          <span class="menu-pilihan-ikon" aria-hidden="true">📖</span>
+          <span><b>Belajar kanji baru</b><small>Segera hadir</small></span>
+        </button>
+        <button type="button" class="menu-pilihan" disabled>
+          <span class="menu-pilihan-ikon" aria-hidden="true">🔁</span>
+          <span><b>Ulangi hari ini</b><small>Segera hadir</small></span>
+        </button>
+        <button type="button" class="menu-pilihan" disabled>
+          <span class="menu-pilihan-ikon" aria-hidden="true">✅</span>
+          <span><b>Latihan pilihan ganda</b><small>Segera hadir</small></span>
+        </button>
+        <a href="#kanji/daftar" class="menu-pilihan">
+          <span class="menu-pilihan-ikon" aria-hidden="true">🗂️</span>
+          <span><b>Daftar kanji</b><small>Lihat semua kanji dan kartunya</small></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ========== HALAMAN DAFTAR KANJI ========== -->
+    <section id="hal-kanji-daftar" class="halaman" hidden>
+      <p><a href="#kanji" class="kembali">← Menu kanji</a></p>
+      <h1>Daftar kanji</h1>
+      <div class="pilihan-chip" id="kanji-level"></div>
+      <p id="kanji-ringkasan" class="redup"></p>
+      <div id="kanji-grid"></div>
+    </section>
   </main>
+
+  <!-- ========== KARTU KANJI (muncul di atas halaman) ========== -->
+  <dialog id="dialog-kanji" class="dialog" aria-label="Kartu kanji">
+    <div class="dialog-kepala">
+      <button type="button" class="tombol-ikon" id="kanji-sebelum" aria-label="Kanji sebelumnya">‹</button>
+      <span id="kanji-posisi" class="redup"></span>
+      <button type="button" class="tombol-ikon" id="kanji-berikut" aria-label="Kanji berikutnya">›</button>
+      <button type="button" class="tombol-ikon" id="kanji-tutup" aria-label="Tutup">✕</button>
+    </div>
+    <div id="dialog-kanji-isi"></div>
+  </dialog>
 
   <!-- ============================================================
        URUTAN FILE PENTING:
        1. js/bahasa.js        (buku daftar bahasa)
-       2. file data           (kosakata, hiragana, dst.)
+       2. file data           (kosakata, kanji, hiragana, dst.)
        3. data/.../materi.js  (mendaftarkan materi bahasa itu)
        4. file program lainnya
        ============================================================ -->
@@ -140,10 +199,13 @@
 
   <!-- Bahasa Jepang -->
   <script src="data/jepang/kosakata-n5.js"></script>
+  <script src="data/jepang/kanji-n5.js"></script>
   <script src="data/jepang/materi.js"></script>
 
+  <script src="js/teks-jepang.js"></script>
   <script src="js/penyimpanan.js"></script>
   <script src="js/soal.js"></script>
+  <script src="js/kanji.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -17,19 +17,29 @@ function persen(benar, total) {
 
 // ------------------------------------------------------------
 // PINDAH HALAMAN
-// Alamat #beranda dan #latihan menentukan halaman yang tampil.
+// Alamat #beranda, #latihan, #kanji, dan #kanji/daftar menentukan
+// halaman yang tampil.
 // ------------------------------------------------------------
 function tampilkanHalaman(nama) {
   document.querySelectorAll(".halaman").forEach((h) => (h.hidden = h.id !== `hal-${nama}`));
-  document.querySelectorAll(".menu a").forEach((a) => a.classList.toggle("aktif", a.dataset.halaman === nama));
+  const menu = nama.split("-")[0]; // "kanji-daftar" → menu "Kanji"
+  document.querySelectorAll(".menu a").forEach((a) => a.classList.toggle("aktif", a.dataset.menu === menu));
   window.scrollTo(0, 0);
 }
 
 function bukaDariAlamat() {
   const nama = location.hash.replace("#", "") || "beranda";
+  const dialog = $("dialog-kanji");
+  if (dialog.open) dialog.close();
+
   if (nama === "latihan") {
     isiFormLatihan();
     tampilkanHalaman("latihan");
+  } else if (nama === "kanji") {
+    tampilkanHalaman("kanji");
+  } else if (nama === "kanji/daftar") {
+    Kanji.tampilkanDaftar();
+    tampilkanHalaman("kanji-daftar");
   } else {
     tampilkanBeranda();
     tampilkanHalaman("beranda");
@@ -37,6 +47,41 @@ function bukaDariAlamat() {
 }
 
 window.addEventListener("hashchange", bukaDariAlamat);
+
+// ------------------------------------------------------------
+// PENGATURAN TAMPILAN (tombol あ): furigana, romaji, tips
+// Caranya: memberi tanda di <html>, lalu CSS yang menyembunyikan.
+// ------------------------------------------------------------
+function terapkanTampilan() {
+  const t = Penyimpanan.data.tampilan;
+  const html = document.documentElement.classList;
+  html.toggle("sembunyi-furigana", !t.furigana);
+  html.toggle("sembunyi-romaji", !t.romaji);
+  html.toggle("sembunyi-tips", !t.tips);
+  $("atur-furigana").checked = t.furigana;
+  $("atur-romaji").checked = t.romaji;
+  $("atur-tips").checked = t.tips;
+}
+
+$("menu-tampilan").addEventListener("change", () => {
+  Penyimpanan.simpanTampilan({
+    furigana: $("atur-furigana").checked,
+    romaji: $("atur-romaji").checked,
+    tips: $("atur-tips").checked,
+  });
+  terapkanTampilan();
+});
+
+// Tombol "Sembunyikan tips / Tampilkan tips" di kartu kanji
+document.addEventListener("click", (e) => {
+  if (e.target.closest('[data-aksi="tips"]')) {
+    Penyimpanan.simpanTampilan({ tips: !Penyimpanan.data.tampilan.tips });
+    terapkanTampilan();
+  }
+  // Tutup panel あ kalau klik di luar panel
+  const panel = $("menu-tampilan");
+  if (panel.open && !panel.contains(e.target)) panel.open = false;
+});
 
 // ------------------------------------------------------------
 // MODE GELAP
@@ -123,9 +168,19 @@ function semuaKategori(materi, levelDipilih) {
   return hasil;
 }
 
+// Materi yang bisa dipakai di halaman Latihan (yang soalnya bisa dibuat soal.js).
+function materiLatihan(bahasa) {
+  return bahasa.materi.filter((m) => Soal.JENIS.includes(m.jenis));
+}
+
+function cariMateriLatihan(bahasa, kodeMateri) {
+  const daftar = materiLatihan(bahasa);
+  return daftar.find((m) => m.kode === kodeMateri) || daftar[0];
+}
+
 function isiFormLatihan() {
   const bahasa = cariBahasa(pengaturan.bahasa);
-  const materi = cariMateri(bahasa, pengaturan.materi);
+  const materi = cariMateriLatihan(bahasa, pengaturan.materi);
   pengaturan.bahasa = bahasa.kode;
   pengaturan.materi = materi.kode;
 
@@ -135,7 +190,7 @@ function isiFormLatihan() {
     buatChip("bahasa", b.kode, `${b.bendera} ${aman(b.nama)}`, b === bahasa)
   ).join("");
 
-  $("pilih-materi").innerHTML = bahasa.materi
+  $("pilih-materi").innerHTML = materiLatihan(bahasa)
     .map((m) => buatChip("materi", m.kode, aman(m.nama), m === materi))
     .join("");
 
@@ -165,7 +220,7 @@ function isiFormLatihan() {
 
 function isiKategori() {
   const bahasa = cariBahasa(pengaturan.bahasa);
-  const materi = cariMateri(bahasa, pengaturan.materi);
+  const materi = cariMateriLatihan(bahasa, pengaturan.materi);
   const levelDipilih = daftarLevel(pengaturan.level, bahasa);
   const kategori = semuaKategori(materi, levelDipilih);
   const dipilih = pengaturan.kategori || kategori;
@@ -197,7 +252,7 @@ function bacaForm() {
 
 function pengaturanLengkap() {
   const bahasa = cariBahasa(pengaturan.bahasa);
-  const materi = cariMateri(bahasa, pengaturan.materi);
+  const materi = cariMateriLatihan(bahasa, pengaturan.materi);
   const level = daftarLevel(pengaturan.level, bahasa);
   return {
     bahasa,
@@ -275,10 +330,20 @@ function teksJepang(teks) {
   return `<span lang="ja">${aman(teks)}</span>`;
 }
 
+// Kata Jepang dengan furigana (kalau furigana dinyalakan di tombol あ)
+function kataFurigana(it) {
+  return `<span lang="ja">${TeksJepang.furigana(it.kata, it.baca)}</span>`;
+}
+
 // Penjelasan singkat sebuah kata: 食べる (たべる · taberu) = Makan
+// Bagian romaji disembunyikan kalau romaji dimatikan di tombol あ.
 function penjelasanKata(it) {
-  const baca = it.baca !== it.kata ? `${aman(it.baca)} · ` : "";
-  return `${teksJepang(it.kata)} <span class="redup">(${baca}${aman(it.romaji)})</span> = ${aman(it.arti)}`;
+  const romaji = aman(it.romaji);
+  const keterangan =
+    it.baca !== it.kata
+      ? `<span class="redup">(${aman(it.baca)}<span class="romaji"> · ${romaji}</span>)</span>`
+      : `<span class="redup romaji">(${romaji})</span>`;
+  return `${teksJepang(it.kata)} ${keterangan} = ${aman(it.arti)}`;
 }
 
 function tampilkanSoal() {
@@ -291,7 +356,9 @@ function tampilkanSoal() {
 
   $("perintah").textContent = s.perintah;
   const teksSoal = $("teks-soal");
-  teksSoal.innerHTML = s.soalJepang ? teksJepang(s.teksSoal) : aman(s.teksSoal);
+  // Furigana hanya di soal "Kata → Arti". Di soal "Cara baca", furigana = jawabannya.
+  if (sesi.arah === "arti") teksSoal.innerHTML = kataFurigana(s.item);
+  else teksSoal.innerHTML = s.soalJepang ? teksJepang(s.teksSoal) : aman(s.teksSoal);
   teksSoal.classList.toggle("jepang", s.soalJepang);
   teksSoal.classList.toggle("panjang", s.teksSoal.length > 8);
 
@@ -299,7 +366,7 @@ function tampilkanSoal() {
     .map(
       (p, i) => `<button type="button" class="pilihan${s.soalJepang ? "" : " jepang"}" data-i="${i}">
         <span class="nomor">${i + 1}</span>
-        <span class="teks">${s.soalJepang ? aman(p.teks) : teksJepang(p.teks)}</span>
+        <span class="teks">${s.soalJepang ? aman(p.teks) : kataFurigana(p.item)}</span>
       </button>`
     )
     .join("");
@@ -427,4 +494,5 @@ $("latihan-lagi").addEventListener("click", () => {
 // ------------------------------------------------------------
 $("logo-bahasa").textContent = DAFTAR_BAHASA[0].logo;
 perbaruiIkonTema();
+terapkanTampilan();
 bukaDariAlamat();

@@ -22,5 +22,11 @@ daftarkanBahasa({
       jenis: "kata", // jenis soal: kata (punya kolom kata, baca, romaji, arti)
       data: [...KOSAKATA_N5],
     },
+    {
+      kode: "kanji",
+      nama: "Kanji",
+      jenis: "kanji", // jenis soal: kanji (punya kolom kanji, onyomi, kunyomi, contoh)
+      data: [...KANJI_N5],
+    },
   ],
 });

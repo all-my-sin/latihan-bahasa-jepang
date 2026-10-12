@@ -147,5 +147,8 @@ const Soal = (() => {
     return kumpulkan(materi, pengaturan, arah).length;
   }
 
-  return { ARAH, buatSesi, buatSesiDariKata, hitungTersedia, kunciKata };
+  // Jenis materi yang bisa dibuat soalnya oleh file ini.
+  const JENIS = ["kata"];
+
+  return { ARAH, JENIS, buatSesi, buatSesiDariKata, hitungTersedia, kunciKata };
 })();

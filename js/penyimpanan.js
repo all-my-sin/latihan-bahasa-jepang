@@ -11,6 +11,7 @@ const Penyimpanan = (() => {
     return {
       pengaturan: {}, // pilihan terakhir di halaman Latihan
       tema: null, // "terang", "gelap", atau null (ikut HP/laptop)
+      tampilan: { furigana: true, romaji: true, tips: true }, // tombol あ di atas
       riwayat: [], // ringkasan setiap sesi latihan
       kategori: {}, // jumlah benar/salah per kategori
       kata: {}, // jumlah benar/salah per kata
@@ -69,6 +70,11 @@ const Penyimpanan = (() => {
 
     simpanTema(tema) {
       data.tema = tema;
+      simpan();
+    },
+
+    simpanTampilan(tampilan) {
+      data.tampilan = { ...data.tampilan, ...tampilan };
       simpan();
     },
 
