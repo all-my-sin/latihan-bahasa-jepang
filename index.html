@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latihan Bahasa Jepang</title>
+
+  <!-- Font Noto Sans JP agar huruf Jepang tampil jelas.
+       Kalau sedang offline, browser memakai font Jepang bawaan HP/laptop. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Pasang mode gelap/terang secepatnya supaya layar tidak berkedip. -->
+  <script>
+    try {
+      const simpanan = JSON.parse(localStorage.getItem("latihanBahasa.v1") || "{}");
+      if (simpanan.tema === "gelap") document.documentElement.dataset.theme = "dark";
+      if (simpanan.tema === "terang") document.documentElement.dataset.theme = "light";
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="kepala">
+    <div class="kepala-isi">
+      <a href="#beranda" class="logo"><span id="logo-bahasa" lang="ja">日本語</span> <span class="logo-teks">Latihan</span></a>
+      <nav class="menu">
+        <a href="#beranda" data-halaman="beranda">Beranda</a>
+        <a href="#latihan" data-halaman="latihan">Latihan</a>
+      </nav>
+      <button id="tombol-tema" class="tombol-ikon" type="button" aria-label="Ganti mode gelap / terang" title="Mode gelap / terang">🌙</button>
+    </div>
+  </header>
+
+  <main class="isi">
+    <!-- ========== HALAMAN BERANDA ========== -->
+    <section id="hal-beranda" class="halaman" hidden>
+      <h1>Selamat datang! <span lang="ja">ようこそ</span></h1>
+      <p class="redup">Latihan JLPT sedikit demi sedikit setiap hari. Progresmu tersimpan di browser ini.</p>
+      <a href="#latihan" class="tombol tombol-utama tombol-lebar">Mulai latihan</a>
+
+      <h2>Ringkasan progres</h2>
+      <div id="ringkasan" class="kotak-angka"></div>
+      <div id="ringkasan-kategori"></div>
+    </section>
+
+    <!-- ========== HALAMAN PENGATURAN LATIHAN ========== -->
+    <section id="hal-latihan" class="halaman" hidden>
+      <h1>Pengaturan latihan</h1>
+      <form id="form-latihan">
+        <fieldset id="grup-bahasa">
+          <legend>Bahasa</legend>
+          <div class="pilihan-chip" id="pilih-bahasa"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Materi</legend>
+          <div class="pilihan-chip" id="pilih-materi"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Level</legend>
+          <div class="pilihan-chip" id="pilih-level"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Jenis soal</legend>
+          <div class="pilihan-chip" id="pilih-arah"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            Kategori
+            <button type="button" id="kategori-semua" class="tombol-kecil">Pilih semua</button>
+            <button type="button" id="kategori-kosong" class="tombol-kecil">Kosongkan</button>
+          </legend>
+          <div class="pilihan-chip" id="pilih-kategori"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Jumlah soal</legend>
+          <div class="pilihan-chip" id="pilih-jumlah"></div>
+        </fieldset>
+
+        <p id="info-tersedia" class="redup"></p>
+        <button type="submit" class="tombol tombol-utama tombol-lebar">Mulai</button>
+      </form>
+    </section>
+
+    <!-- ========== HALAMAN SOAL ========== -->
+    <section id="hal-soal" class="halaman" hidden>
+      <div class="baris-progres">
+        <span id="nomor-soal"></span>
+        <span id="skor-sementara"></span>
+      </div>
+      <div class="bilah"><div id="bilah-isi"></div></div>
+
+      <div class="kartu-soal">
+        <p id="perintah" class="redup"></p>
+        <p id="teks-soal" class="teks-soal"></p>
+      </div>
+
+      <div id="daftar-pilihan" class="daftar-pilihan"></div>
+
+      <div id="umpan-balik" class="umpan-balik" hidden></div>
+
+      <div class="baris-tombol">
+        <button type="button" id="tombol-berhenti" class="tombol">Berhenti</button>
+        <button type="button" id="tombol-lanjut" class="tombol tombol-utama" hidden>Lanjut →</button>
+      </div>
+    </section>
+
+    <!-- ========== HALAMAN HASIL ========== -->
+    <section id="hal-hasil" class="halaman" hidden>
+      <h1>Hasil latihan</h1>
+      <div class="kartu-skor">
+        <p id="skor-besar" class="skor-besar"></p>
+        <p id="pesan-skor" class="redup"></p>
+      </div>
+
+      <div id="daftar-salah"></div>
+
+      <div class="baris-tombol tumpuk">
+        <button type="button" id="ulangi-salah" class="tombol tombol-utama">Ulangi soal yang salah</button>
+        <button type="button" id="latihan-lagi" class="tombol">Latihan lagi (pengaturan sama)</button>
+        <a href="#latihan" class="tombol">Ubah pengaturan</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       URUTAN FILE PENTING:
+       1. js/bahasa.js        (buku daftar bahasa)
+       2. file data           (kosakata, hiragana, dst.)
+       3. data/.../materi.js  (mendaftarkan materi bahasa itu)
+       4. file program lainnya
+       ============================================================ -->
+  <script src="js/bahasa.js"></script>
+
+  <!-- Bahasa Jepang -->
+  <script src="data/jepang/kosakata-n5.js"></script>
+  <script src="data/jepang/materi.js"></script>
+
+  <script src="js/penyimpanan.js"></script>
+  <script src="js/soal.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
