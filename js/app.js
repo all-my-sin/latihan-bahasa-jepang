@@ -17,8 +17,8 @@ function persen(benar, total) {
 
 // ------------------------------------------------------------
 // PINDAH HALAMAN
-// Alamat #beranda, #latihan, #kanji, dan #kanji/daftar menentukan
-// halaman yang tampil.
+// Alamat #beranda, #latihan, #huruf, #kanji, #kanji/daftar, dst.
+// menentukan halaman yang tampil.
 // ------------------------------------------------------------
 function tampilkanHalaman(nama) {
   document.querySelectorAll(".halaman").forEach((h) => (h.hidden = h.id !== `hal-${nama}`));
@@ -29,12 +29,14 @@ function tampilkanHalaman(nama) {
 
 function bukaDariAlamat() {
   const nama = location.hash.replace("#", "") || "beranda";
-  const dialog = $("dialog-kanji");
-  if (dialog.open) dialog.close();
+  KartuDialog.tutup();
 
   if (nama === "latihan") {
     isiFormLatihan();
     tampilkanHalaman("latihan");
+  } else if (nama === "huruf") {
+    Huruf.tampilkanTabel();
+    tampilkanHalaman("huruf");
   } else if (nama === "kanji") {
     tampilkanHalaman("kanji");
   } else if (nama === "kanji/latihan") {

@@ -29,5 +29,17 @@ daftarkanBahasa({
       data: [...KANJI_N5],
       mirip: KANJI_MIRIP, // kelompok kanji yang bentuknya mirip (untuk pilihan jawaban)
     },
+    {
+      kode: "hiragana",
+      nama: "Hiragana",
+      jenis: "huruf", // jenis soal: huruf (punya kolom huruf, romaji, baris, pasangan)
+      data: [...HIRAGANA],
+    },
+    {
+      kode: "katakana",
+      nama: "Katakana",
+      jenis: "huruf",
+      data: [...KATAKANA],
+    },
   ],
 });

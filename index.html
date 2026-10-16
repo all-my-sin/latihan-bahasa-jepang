@@ -33,6 +33,7 @@
       <nav class="menu">
         <a href="#beranda" data-menu="beranda"><span class="menu-ikon" aria-hidden="true">🏠</span>Beranda</a>
         <a href="#latihan" data-menu="latihan"><span class="menu-ikon" aria-hidden="true">✏️</span>Latihan</a>
+        <a href="#huruf" data-menu="huruf"><span class="menu-ikon" lang="ja" aria-hidden="true">かな</span>Huruf</a>
         <a href="#kanji" data-menu="kanji"><span class="menu-ikon" lang="ja" aria-hidden="true">漢</span>Kanji</a>
       </nav>
       <!-- Tombol あ: pengaturan furigana, romaji, dan tips (berlaku di semua halaman) -->
@@ -146,6 +147,15 @@
       </div>
     </section>
 
+    <!-- ========== HALAMAN HURUF (tabel hiragana / katakana) ========== -->
+    <section id="hal-huruf" class="halaman" hidden>
+      <h1>Huruf <span lang="ja">ひらがな・カタカナ</span></h1>
+      <div class="pilihan-chip" id="huruf-tulisan"></div>
+      <div id="huruf-progres" class="huruf-progres"></div>
+      <div class="legenda" id="huruf-legenda"></div>
+      <div id="huruf-tabel"></div>
+    </section>
+
     <!-- ========== HALAMAN MENU KANJI ========== -->
     <section id="hal-kanji" class="halaman" hidden>
       <h1>Kanji <span lang="ja">漢字</span></h1>
@@ -208,15 +218,15 @@
     </section>
   </main>
 
-  <!-- ========== KARTU KANJI (muncul di atas halaman) ========== -->
-  <dialog id="dialog-kanji" class="dialog" aria-label="Kartu kanji">
+  <!-- ========== KARTU KANJI / HURUF (muncul di atas halaman) ========== -->
+  <dialog id="dialog-kartu" class="dialog" aria-label="Kartu">
     <div class="dialog-kepala">
-      <button type="button" class="tombol-ikon" id="kanji-sebelum" aria-label="Kanji sebelumnya">‹</button>
-      <span id="kanji-posisi" class="redup"></span>
-      <button type="button" class="tombol-ikon" id="kanji-berikut" aria-label="Kanji berikutnya">›</button>
-      <button type="button" class="tombol-ikon" id="kanji-tutup" aria-label="Tutup">✕</button>
+      <button type="button" class="tombol-ikon" id="kartu-sebelum" aria-label="Sebelumnya">‹</button>
+      <span id="kartu-posisi" class="redup"></span>
+      <button type="button" class="tombol-ikon" id="kartu-berikut" aria-label="Berikutnya">›</button>
+      <button type="button" class="tombol-ikon" id="kartu-tutup" aria-label="Tutup">✕</button>
     </div>
-    <div id="dialog-kanji-isi"></div>
+    <div id="dialog-kartu-isi"></div>
   </dialog>
 
   <!-- ============================================================
@@ -232,13 +242,17 @@
   <script src="data/jepang/kosakata-n5.js"></script>
   <script src="data/jepang/kanji-n5.js"></script>
   <script src="data/jepang/kanji-mirip.js"></script>
+  <script src="data/jepang/hiragana.js"></script>
+  <script src="data/jepang/katakana.js"></script>
   <script src="data/jepang/materi.js"></script>
 
   <script src="js/teks-jepang.js"></script>
   <script src="js/penyimpanan.js"></script>
   <script src="js/soal.js"></script>
   <script src="js/soal-kanji.js"></script>
+  <script src="js/kartu-dialog.js"></script>
   <script src="js/kanji.js"></script>
+  <script src="js/huruf.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -24,6 +24,12 @@
   --on-lembut: #f8e9f6;
   --khusus: #9a5b00;
   --khusus-lembut: #fdf3d8;
+  /* warna status hafalan (sementara, diganti di tahap 4) */
+  --status-baru: #efece4;
+  --status-belajar: #f8e3b5;
+  --status-belajar-garis: #c98a12;
+  --status-hafal: #dcebd0;
+  --status-hafal-garis: #4f7a33;
   --bayangan: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
   --sudut: 14px;
   --font: "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -50,6 +56,11 @@
     --on-lembut: #3a1f37;
     --khusus: #f5c542;
     --khusus-lembut: #3a3115;
+    --status-baru: #2a2d31;
+    --status-belajar: #4a3a14;
+    --status-belajar-garis: #e0a83a;
+    --status-hafal: #24391c;
+    --status-hafal-garis: #8cc06a;
     --bayangan: none;
     color-scheme: dark;
   }
@@ -74,6 +85,11 @@
   --on-lembut: #3a1f37;
   --khusus: #f5c542;
   --khusus-lembut: #3a3115;
+  --status-baru: #2a2d31;
+  --status-belajar: #4a3a14;
+  --status-belajar-garis: #e0a83a;
+  --status-hafal: #24391c;
+  --status-hafal-garis: #8cc06a;
   --bayangan: none;
   color-scheme: dark;
 }
@@ -295,7 +311,7 @@ legend {
   opacity: 0;
   pointer-events: none;
 }
-.chip span {
+.chip > span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -551,9 +567,9 @@ legend {
   background: var(--kartu);
   border-bottom: 1px solid var(--garis);
 }
-.dialog-kepala #kanji-posisi { flex: 1; text-align: center; }
-.dialog-kepala #kanji-tutup { margin-left: 8px; }
-#dialog-kanji-isi { padding: 12px; }
+.dialog-kepala #kartu-posisi { flex: 1; text-align: center; }
+.dialog-kepala #kartu-tutup { margin-left: 8px; }
+#dialog-kartu-isi { padding: 12px; }
 
 .kartu-kanji {
   padding: 16px;
@@ -717,3 +733,81 @@ legend {
 .kk-catatan.blok { display: block; }
 .umpan-kartu { margin-top: 12px; }
 .soal-salah .arti-soal { display: inline; margin-left: 8px; font-size: 0.9rem; }
+
+/* ---------- Halaman Huruf (tabel hiragana / katakana) ---------- */
+.huruf-progres { display: grid; gap: 10px; margin: 16px 0; }
+.hp-judul { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; }
+.hp-judul span:last-child { color: var(--redup); white-space: nowrap; }
+
+.legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; color: var(--redup); }
+.legenda-isi { display: inline-flex; align-items: center; gap: 6px; }
+.legenda-warna {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 2px solid var(--garis);
+  vertical-align: middle;
+}
+
+/* Warna status hafalan — dipakai di tabel huruf (dan nanti daftar kanji) */
+.status-baru { background: var(--status-baru); border-color: var(--garis); }
+.status-belajar { background: var(--status-belajar); border-color: var(--status-belajar-garis); }
+.status-hafal { background: var(--status-hafal); border-color: var(--status-hafal-garis); }
+
+.tabel-kana {
+  display: grid;
+  grid-template-columns: 2.6rem repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  align-items: stretch;
+}
+.tabel-kana.kolom-3 { grid-template-columns: 2.6rem repeat(3, minmax(0, 1fr)); max-width: 420px; }
+.tk-kepala, .tk-baris {
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--redup);
+}
+.tk-kepala { padding-bottom: 2px; }
+.tk-sudut, .tk-kosong { min-height: 64px; }
+.tk-sudut { min-height: 0; }
+.sel-kana {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 4px 2px;
+  border: 2px solid var(--garis);
+  border-radius: 10px;
+  color: var(--teks);
+  font: inherit;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .sel-kana:hover { border-color: var(--utama); }
+}
+.sk-huruf { font-size: 1.7rem; line-height: 1.2; }
+.sk-romaji { font-size: 0.75rem; color: var(--redup); }
+
+.kh-romaji { font-size: 1.6rem; font-weight: 700; margin: 0 0 6px; }
+.kh-status { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 0.9rem; }
+.kh-pasangan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--garis);
+  border-radius: 10px;
+}
+.kh-pasangan-huruf { font-size: 2rem; line-height: 1.2; }
+.sorot { background: var(--utama-lembut); color: var(--utama); border-radius: 4px; padding: 0 2px; }
+
+@media (max-width: 420px) {
+  .tabel-kana { grid-template-columns: 2.2rem repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .tabel-kana.kolom-3 { grid-template-columns: 2.2rem repeat(3, minmax(0, 1fr)); }
+  .sk-huruf { font-size: 1.45rem; }
+}

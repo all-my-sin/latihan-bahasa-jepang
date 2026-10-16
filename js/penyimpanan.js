@@ -11,6 +11,7 @@ const Penyimpanan = (() => {
     return {
       pengaturan: {}, // pilihan terakhir di halaman Latihan
       pengaturanKanji: {}, // pilihan terakhir di halaman Latihan pilihan ganda kanji
+      pengaturanHuruf: {}, // pilihan terakhir di halaman Huruf (hiragana/katakana, baris)
       tema: null, // "terang", "gelap", atau null (ikut HP/laptop)
       tampilan: { furigana: true, romaji: true, tips: true }, // tombol あ di atas
       riwayat: [], // ringkasan setiap sesi latihan
@@ -71,6 +72,11 @@ const Penyimpanan = (() => {
 
     simpanPengaturanKanji(pengaturan) {
       data.pengaturanKanji = pengaturan;
+      simpan();
+    },
+
+    simpanPengaturanHuruf(pengaturan) {
+      data.pengaturanHuruf = { ...data.pengaturanHuruf, ...pengaturan };
       simpan();
     },
 

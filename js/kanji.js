@@ -103,7 +103,6 @@ const Kanji = (() => {
   // ------------------------------------------------------------
   let levelDipilih = null;
   let urutanTampil = []; // urutan kanji seperti di layar (untuk tombol ‹ ›)
-  let posisiKartu = -1;
 
   function tampilkanDaftar() {
     const { bahasa, data } = semuaKanji();
@@ -152,40 +151,12 @@ const Kanji = (() => {
     tampilkanDaftar();
   });
 
+  // Klik kanji → buka kartunya (kotak kartu ada di kartu-dialog.js)
   el("kanji-grid").addEventListener("click", (e) => {
     const sel = e.target.closest(".sel-kanji");
     if (!sel) return;
     const indeks = urutanTampil.findIndex((k) => k.id === Number(sel.dataset.id));
-    bukaKartu(indeks);
-  });
-
-  // ------------------------------------------------------------
-  // KARTU DI ATAS HALAMAN (dialog)
-  // ------------------------------------------------------------
-  const dialog = el("dialog-kanji");
-
-  function bukaKartu(indeks) {
-    if (indeks < 0 || indeks >= urutanTampil.length) return;
-    posisiKartu = indeks;
-    el("dialog-kanji-isi").innerHTML = kartu(urutanTampil[indeks]);
-    el("kanji-posisi").textContent = `${indeks + 1} / ${urutanTampil.length}`;
-    el("kanji-sebelum").disabled = indeks === 0;
-    el("kanji-berikut").disabled = indeks === urutanTampil.length - 1;
-    if (!dialog.open) dialog.showModal();
-    dialog.scrollTop = 0;
-  }
-
-  el("kanji-sebelum").addEventListener("click", () => bukaKartu(posisiKartu - 1));
-  el("kanji-berikut").addEventListener("click", () => bukaKartu(posisiKartu + 1));
-  el("kanji-tutup").addEventListener("click", () => dialog.close());
-  // Klik di luar kartu (bagian gelap) juga menutup
-  dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) dialog.close();
-  });
-  // Tombol panah kiri/kanan di laptop
-  dialog.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") bukaKartu(posisiKartu - 1);
-    if (e.key === "ArrowRight") bukaKartu(posisiKartu + 1);
+    KartuDialog.buka(urutanTampil, indeks, (k) => kartu(k));
   });
 
   // ------------------------------------------------------------
