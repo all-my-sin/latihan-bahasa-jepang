@@ -44,7 +44,7 @@ const Huruf = (() => {
   // ------------------------------------------------------------
   // HALAMAN TABEL
   // ------------------------------------------------------------
-  let tulisan = Penyimpanan.data.pengaturanHuruf.tulisan || "hiragana";
+  let tulisan = (Penyimpanan.data.pengaturanHuruf || {}).tulisan || "hiragana";
 
   function sel(h, kode) {
     const status = statusHuruf(kode, h.id);
